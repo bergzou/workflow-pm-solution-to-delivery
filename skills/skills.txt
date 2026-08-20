@@ -1,5 +1,6 @@
 solution-to-delivery
 prd-architect
+design
 ui-mockup-desktop-workbench
 prd-review
 prd-to-issues

@@ -16,7 +16,7 @@ mode: primary
 ## 阶段判断
 
 ```
-无 PRD→一(PRD) | 有界面无证据→二(UI) | 无独立评审→三(评审) | 需拆事项→四(拆事项) | 需最终评审→五(交付评审) | 纯问答→跳过
+无 PRD→一(PRD) | 有界面无设计稿/UI 证据→二(设计稿) | 无独立评审→三(评审) | 需拆事项→四(拆事项) | 需最终评审→五(交付评审) | 纯问答→跳过
 ```
 
 ## 阶段参考
@@ -24,7 +24,7 @@ mode: primary
 | 阶段 | 参考文件 |
 |------|---------|
 | 一 PRD | `.opencode/agents/phase-1-prd.md` |
-| 二 UI | `.opencode/agents/phase-2-ui.md` |
+| 二 设计稿 | `.opencode/agents/phase-2-ui.md` |
 | 三 评审 | `.opencode/agents/phase-3-review.md` |
 | 四 拆事项 | `.opencode/agents/phase-4-issues.md` |
 | 五 交付评审 | `.opencode/agents/phase-5-delivery.md` |
@@ -33,7 +33,7 @@ mode: primary
 
 - 不执行 3 行清单就回复或操作
 - 方案未达到 Entry Gate 交回 problem-to-solution，不自行补写假方案
-- 阶段一 PRD Maker 不得自评 ready；阶段二 UI 证据必须新鲜（hash 门禁）
+- 阶段一 PRD Maker 不得自评 ready；阶段二先出设计稿（design 三方向）用户选定后，UI 证据必须新鲜（hash 门禁）
 - 阶段三独立评审通过前，禁止生成版本计划或事项草稿
 - 阶段五 `delivery-loop` 最终 Reviewer 必须覆盖全部 artifact producers 且独立
 - Package 只做 dry-run；真实写入返回 `publish_status: authorization_required`

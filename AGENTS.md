@@ -34,12 +34,12 @@
 
 ## 🔴 当前阶段判断
 
-**无 PRD → 阶段一 | 有界面无 UI 证据 → 阶段二 | 无独立评审 → 阶段三 | 需版本拆分 → 阶段四 | 需最终评审 → 阶段五（package_ready）**
+**无 PRD → 阶段一 | 有界面无设计稿/UI 证据 → 阶段二 | 无独立评审 → 阶段三 | 需版本拆分 → 阶段四 | 需最终评审 → 阶段五（package_ready）**
 
 | 阶段 | 必须加载的技能 | 触发条件 |
 |------|--------------|---------|
 | 🔴 一 PRD | `prd-architect` | 生成 PRD + Product Delivery Manifest |
-| 🔴 二 UI | `ui-mockup-desktop-workbench` | 有用户可见界面，需 HTML/截图证据 |
+| 🔴 二 设计稿 | `design` + `ui-mockup-desktop-workbench` | 有用户可见界面：先出高保真设计稿（design 三方向），选定后再做结构→实现 handoff |
 | 🔴 三 评审 | `prd-review` | 独立检查 PRD/UI 证据，写 `pre_split_review` |
 | 🔴 四 拆事项 | `prd-to-issues` | 用户要求版本或研发拆分 |
 | 🔴 五 交付评审 | `delivery-loop` + validator | 完整 Package 最终独立 Review |
@@ -71,10 +71,10 @@
 ```
 阶段一 [PRD]
   │ 门禁：PRD 与已确认方案一致，Manifest 初始化，状态 review_pending
-  │ 检查：页面型 PRD 必须联动 UI 证据链；禁止 PRD Maker 自评 ready
+  │ 检查：页面型 PRD 必须联动设计稿与 UI 证据链；禁止 PRD Maker 自评 ready
   ▼
-阶段二 [UI]
-  │ 门禁：目标态 HTML/预览 + 关键状态截图 + 证据新鲜度（mockup-evidence）
+阶段二 [设计稿]
+  │ 门禁：design 三方向真实初稿 → 用户选定（direction-approved）→ 目标态 HTML/预览 + 关键状态截图 + 证据新鲜度
   │ 无界面需求：记录 ui_required=false 的可解释原因
   ▼
 阶段三 [评审]
@@ -112,7 +112,7 @@
 | 阶段 | 触发条件 | 参考文件 |
 |------|---------|---------|
 | 一 PRD | 无 PRD | `.opencode/agents/phase-1-prd.md` |
-| 二 UI | 有界面无证据 | `.opencode/agents/phase-2-ui.md` |
+| 二 设计稿 | 有界面无设计稿/UI 证据 | `.opencode/agents/phase-2-ui.md` |
 | 三 评审 | 无独立评审 | `.opencode/agents/phase-3-review.md` |
 | 四 拆事项 | 需版本/研发拆分 | `.opencode/agents/phase-4-issues.md` |
 | 五 交付评审 | 需最终 Review | `.opencode/agents/phase-5-delivery.md` |
