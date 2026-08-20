@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md", ".opencode/AGENTS.md"],
+  "skills": {
+    "paths": ["./skills", "./.opencode/skills"]
+  },
+  "agent": {
+    "workflow-pm-solution-to-delivery": {
+      "description": "AI 产品经理：方案到交付工作流总控——PRD、UI/截图、独立评审、拆事项到 package_ready（发布仅 dry-run）",
+      "mode": "primary",
+      "prompt": "{file:./agents/workflow.md}"
+    }
+  }
+}

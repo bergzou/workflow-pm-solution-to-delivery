@@ -1,0 +1,533 @@
+{
+  "skill_name": "prd-architect",
+  "evals": [
+    {
+      "id": "new-prd-initializes-version-history",
+      "type": "behavior-regression",
+      "prompt": "帮我新建一份 PRD，并准备后续发布到钉钉。",
+      "expected_output": "The PRD starts with a version history table immediately after the title. Its first row is V1.0, uses today's date, and records 首次创建.",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "The first H2 after the PRD title is 版本记录."
+        },
+        {
+          "text": "The table columns are 版本, 日期, and 修改内容, with a V1.0 initial row."
+        },
+        {
+          "text": "The initial change summary contains 首次创建."
+        }
+      ]
+    },
+    {
+      "id": "existing-prd-prepends-concrete-minor-version",
+      "type": "behavior-regression",
+      "prompt": "这份 PRD 当前最新版本是 V1.1。补充企业成员安装和取消连接器的规则，其他产品范围不变。",
+      "expected_output": "Reads the existing version history, keeps all old rows, prepends V1.2 with today's date, and summarizes the member install and disconnect changes concretely.",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "The new top row is V1.2 and older rows remain unchanged below it."
+        },
+        {
+          "text": "The change summary names the actual member installation and disconnect rule changes rather than saying only 更新 PRD."
+        },
+        {
+          "text": "The change remains a minor version because the product goal and core workflow did not materially change."
+        }
+      ]
+    },
+    {
+      "id": "publish-retry-does-not-create-version",
+      "type": "boundary-risk",
+      "prompt": "钉钉发布刚才超时了，PRD 内容没有任何变化。重新发布前帮我处理一下版本。",
+      "expected_output": "Does not add a new version row because this is a publish retry with unchanged product content.",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "No new version row is created for an unchanged publish retry."
+        }
+      ]
+    },
+    {
+      "id": "standard-product-draft-no-schema",
+      "type": "trigger",
+      "prompt": "帮我写一份 Agent 回答后的下一步行动建议 PRD 初版。下一步行动不是所有回答都有，图片生成后可以改图或生成视频，PPT 成功后下载/编辑是功能按钮，不算 Agent 下一步；点击下一步行动只预填输入框让用户确认。",
+      "expected_output": "选择 PRD-standard 或 PRD-ai-native 的产品讨论稿，用不超过 200 字的短背景说明问题；按功能模块写目标态 UI、触发、不展示条件、功能按钮与 Agent 行动的区别、点击预填输入框和可验证结果，不单列用户场景或验收等重复章节，也不输出 TypeScript interface、JSON schema、metadata 或 adapter 细节。",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "Selects PRD-standard or PRD-ai-native and keeps observable, verifiable results inside the relevant feature logic instead of a standalone acceptance section."
+        },
+        {
+          "text": "Distinguishes Agent next actions from ordinary function buttons and preserves click-to-prefill confirmation behavior."
+        },
+        {
+          "text": "Does not introduce TypeScript interfaces, JSON schema, metadata, or adapter details into the initial product draft."
+        }
+      ]
+    },
+    {
+      "id": "lite-existing-page-mockup-handoff",
+      "type": "trigger",
+      "prompt": "帮我写一个 PRD：在现有聊天页点击发送时，如果沙箱并发已满，要弹出确认提示并保留输入内容。需要说明页面状态和截图承接。",
+      "expected_output": "选择 PRD-lite，加载 mockup handoff，以一个功能模块呈现目标态弹窗截图、触发、状态、反馈和可验证结果；不生成独立验收章节、用户场景或流程图，不发散成工作区管理页。",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "Selects PRD-lite and describes the existing-page trigger, preserved input, modal states, and observable results without a standalone acceptance section."
+        },
+        {
+          "text": "Loads the mockup handoff without forcing Draw.io or expanding into workspace management."
+        }
+      ]
+    },
+    {
+      "id": "diagram-request-loads-drawio",
+      "type": "trigger",
+      "prompt": "帮我写一个 PRD，并补一张可编辑 Draw.io 核心流程图，描述用户提交需求后 Agent 澄清、生成、人工确认、失败回退的链路。",
+      "expected_output": "选择 PRD-ai-native，加载 drawio templates，写清人/AI协作、状态反馈、人工确认和失败回退，并要求验证 .drawio 可编辑性。",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "Selects PRD-ai-native and models human actions, AI actions, state feedback, confirmation, and failure fallback."
+        },
+        {
+          "text": "Produces or requires an editable Draw.io source and validates its editability."
+        }
+      ]
+    },
+    {
+      "id": "publish-ready-mock-screenshots-inline",
+      "type": "behavior-regression",
+      "prompt": "帮我写一个 PRD，后面要上传钉钉。这个需求有两个 HTML mock：选择文件后的输入框状态、发送后的任务卡状态。mock 截图要放到对应模块里，别放开发点不开的本地链接。",
+      "expected_output": "启用发布版正文规则，选择合适 PRD 模板，加载 mockup handoff；实际渲染两个目标一致的 HTML mock、生成截图，并把截图嵌入输入框状态和任务卡状态章节；文档信息表不放本地 mock 链接，默认不输出关联产物聚合区或待确认事项正文。",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "expectations": [
+        "实际生成至少一张截图文件，而不是只写截图占位或截图计划。",
+        "PRD 正文存在 Markdown 图片引用，且图片位于对应功能或状态章节。",
+        "本地附录或 HTML 路径不被当作正文截图的替代品。"
+      ],
+      "assertions": [
+        {
+          "text": "实际生成至少一张截图文件，而不是只写截图占位或截图计划。"
+        },
+        {
+          "text": "PRD 正文存在 Markdown 图片引用，且图片位于对应功能或状态章节。"
+        },
+        {
+          "text": "本地附录或 HTML 路径不被当作正文截图的替代品。"
+        }
+      ]
+    },
+    {
+      "id": "legacy-mock-mismatch-does-not-become-target-evidence",
+      "type": "behavior-regression",
+      "prompt": "基于提供的旧版 HTML mockup 写一份 AI 产品健康看板 PRD。新方案收敛为四个页面：每日指挥台、结果与成本、能力健康、问题中心。请把关键页面截图放进对应功能章节。",
+      "expected_output": "先识别输入 HTML 是五页签旧结构，与四页面目标不一致；不得直接把旧截图当目标稿。应先更新 HTML 后渲染截图并内嵌，或明确标注结构不匹配并转 UI mockup；不能只在附录列 HTML 路径后结束。",
+      "files": [
+        "evals/fixtures/legacy-five-tab-dashboard.html"
+      ],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "expectations": [
+        "明确指出旧 HTML 的五页签结构与新 PRD 的四页面结构不一致。",
+        "旧 HTML 截图没有被标记或表述为目标状态设计。",
+        "若交付目标态 PRD，则先生成与四页面结构一致的 HTML 和真实截图文件。",
+        "目标态截图嵌入对应功能章节，而不是只出现在关联产物或本地草稿附录。",
+        "无法更新原型或截图时，明确说明跳过原因、受影响页面和待补动作。"
+      ],
+      "assertions": [
+        {
+          "text": "明确指出旧 HTML 的五页签结构与新 PRD 的四页面结构不一致。"
+        },
+        {
+          "text": "旧 HTML 截图没有被标记或表述为目标状态设计。"
+        },
+        {
+          "text": "若交付目标态 PRD，则先生成与四页面结构一致的 HTML 和真实截图文件。"
+        },
+        {
+          "text": "目标态截图嵌入对应功能章节，而不是只出现在关联产物或本地草稿附录。"
+        },
+        {
+          "text": "无法更新原型或截图时，明确说明跳过原因、受影响页面和待补动作。"
+        }
+      ]
+    },
+    {
+      "id": "ui-bearing-prd-auto-generates-artifacts",
+      "type": "behavior-regression",
+      "prompt": "基于可读取的真实项目写一份 PRD：在现有订单列表新增退款审批抽屉，包含默认、无权限、审批成功和审批失败状态。请把产物写入输出目录。",
+      "expected_output": "即使用户没有额外说要 HTML，也识别为页面型 PRD，自动生成项目 UI 对齐 HTML、关键状态截图，并把截图嵌入对应功能或状态章节。",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "expectations": [
+        "输出目录存在 PRD Markdown、HTML mockup 和至少一张关键状态截图。",
+        "PRD 功能正文存在指向真实截图文件的 Markdown 图片引用。",
+        "交付说明列出真实项目 UI 证据，standalone HTML 被标记为视觉参考而非生产代码。"
+      ],
+      "assertions": [
+        {
+          "text": "输出目录存在 PRD Markdown、HTML mockup 和至少一张关键状态截图。"
+        },
+        {
+          "text": "PRD 功能正文存在指向真实截图文件的 Markdown 图片引用。"
+        },
+        {
+          "text": "交付说明列出真实项目 UI 证据，standalone HTML 被标记为视觉参考而非生产代码。"
+        }
+      ]
+    },
+    {
+      "id": "backend-only-prd-does-not-generate-ui",
+      "type": "boundary-risk",
+      "prompt": "写一份内部事件 API 的租户级限流、重试和告警策略 PRD。该能力完全没有用户可见界面，也不需要运营后台。",
+      "expected_output": "只交付 PRD，不生成 HTML 或截图，并说明未触发 UI 证据链。",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "expectations": [
+        "存在 PRD Markdown。",
+        "不存在 HTML 或截图产物。",
+        "说明该需求没有用户可见界面，因此未触发 UI 证据链。"
+      ],
+      "assertions": [
+        {
+          "text": "存在 PRD Markdown。"
+        },
+        {
+          "text": "不存在 HTML 或截图产物。"
+        },
+        {
+          "text": "说明该需求没有用户可见界面，因此未触发 UI 证据链。"
+        }
+      ]
+    },
+    {
+      "id": "ambiguous-frontend-source-asks-before-visual-generation",
+      "type": "boundary-risk",
+      "prompt": "帮我给现有企业后台新增审批中心并生成 PRD 和 HTML。当前 workspace 里有 admin-web、console-latest 两个可能的前端仓库，我没有说明真实页面在哪个项目。",
+      "expected_output": "识别 UI 来源不唯一，先问一个简短的真实前端确认问题；可以继续整理 PRD 文案，但不得自行选择名称带 latest 的目录生成声称项目对齐的 HTML。",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "expectations": [
+        "视觉工作流停在 source_resolution_required。",
+        "问题只要求确认真实 repo/app/route，不重复询问可从仓库读取的信息。",
+        "确认来源前不存在声称项目对齐的 HTML 或截图。"
+      ],
+      "assertions": [
+        {
+          "text": "视觉工作流停在 source_resolution_required。"
+        },
+        {
+          "text": "问题只要求确认真实 repo/app/route，不重复询问可从仓库读取的信息。"
+        },
+        {
+          "text": "确认来源前不存在声称项目对齐的 HTML 或截图。"
+        }
+      ]
+    },
+    {
+      "id": "screenshot-fallback-records-lower-confidence-baseline",
+      "type": "behavior-regression",
+      "prompt": "我们没有可访问的前端仓库，只能给你一张当前页面截图。请按截图风格写页面型 PRD、生成 HTML 和截图。",
+      "expected_output": "在用户已确认无仓库的前提下，以 screenshot 作为低置信 UI 基线，提取可观察的颜色、字体、间距、圆角、密度和导航结构；记录原图 hash，不声称生产组件或 token 已验证，并完成 manifest 新鲜度门禁。",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "expectations": [
+        "mockup-evidence.json 的 baseline.kind 为 screenshot。",
+        "输出明确区分截图可观察规范与未验证的生产实现。",
+        "HTML、截图和 PRD 引用通过当前证据校验。"
+      ],
+      "assertions": [
+        {
+          "text": "mockup-evidence.json 的 baseline.kind 为 screenshot。"
+        },
+        {
+          "text": "输出明确区分截图可观察规范与未验证的生产实现。"
+        },
+        {
+          "text": "HTML、截图和 PRD 引用通过当前证据校验。"
+        }
+      ]
+    },
+    {
+      "id": "updated-html-invalidates-existing-screenshots",
+      "type": "behavior-regression",
+      "prompt": "页面型 PRD 的 mockup.html 刚按最新前端改过，但 screenshots 目录仍是旧版图片。请检查并完成交付。",
+      "expected_output": "识别 HTML 变化使现有截图失效，重新渲染关键状态、更新 PRD 内嵌图片并生成 mockup-evidence.json；不得因为旧图片存在而声明完成。",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "expectations": [
+        "旧截图在重拍前被判定为 stale。",
+        "每张新截图记录当前 HTML SHA-256 为 source_mockup_sha256。",
+        "PRD 引用、HTML hash、截图 hash 和 UI baseline 通过确定性门禁。"
+      ],
+      "assertions": [
+        {
+          "text": "旧截图在重拍前被判定为 stale。"
+        },
+        {
+          "text": "每张新截图记录当前 HTML SHA-256 为 source_mockup_sha256。"
+        },
+        {
+          "text": "PRD 引用、HTML hash、截图 hash 和 UI baseline 通过确定性门禁。"
+        }
+      ]
+    },
+    {
+      "id": "paired-prd-drafting-stage",
+      "type": "routing-regression",
+      "prompt": "当前只有一个已确认的产品想法，还没有 PRD；请起草 PRD，暂不评审 readiness，也不拆研发 issues。",
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "expected_output": "Drafts the PRD from the confirmed idea and stops before readiness review or issue decomposition.",
+      "assertions": [
+        {
+          "text": "Owns PRD drafting when no PRD artifact exists."
+        }
+      ],
+      "known_regression": "docs/audits/skill-overlap-v0.2.1.md"
+    },
+    {
+      "id": "paired-prd-readiness-review-stage",
+      "type": "non-trigger",
+      "prompt": "已有一份 PRD，但交付开发前的阻断项还没评审；请给 readiness verdict，暂不拆研发 issues。",
+      "should_trigger": false,
+      "expected_route": "prd-review",
+      "expected_output": "Hands the existing PRD to prd-review for blocker findings and a readiness verdict.",
+      "assertions": [
+        {
+          "text": "Does not rewrite the PRD when the requested responsibility is readiness review."
+        }
+      ]
+    },
+    {
+      "id": "paired-prd-ready-issue-decomposition-stage",
+      "type": "non-trigger",
+      "prompt": "PRD 已完成评审并标记 Ready；请按 vertical slice 拆成可领取的研发 issues，不再改写或评审 PRD。",
+      "should_trigger": false,
+      "expected_route": "prd-to-issues",
+      "expected_output": "Hands the Ready PRD to prd-to-issues for vertical-slice backlog decomposition.",
+      "assertions": [
+        {
+          "text": "Does not keep drafting after the PRD is Ready and the user requests issue decomposition."
+        }
+      ]
+    },
+    {
+      "id": "paired-prd-only-before-ui-structure",
+      "type": "trigger",
+      "prompt": "当前只有桌面工作台需求想法，还没有 PRD；请先起草 PRD，暂不输出线框或高保真 UI。",
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "expected_output": "Drafts the desktop-workbench PRD and stops before wireframe or high-fidelity UI production.",
+      "assertions": [
+        {
+          "text": "Creates the PRD contract before any UI artifact."
+        }
+      ]
+    },
+    {
+      "id": "paired-structure-stage-before-high-fidelity",
+      "type": "non-trigger",
+      "prompt": "桌面工作台 PRD 已可用，但页面结构和状态模型还没确认；请只输出 screen inventory、state model 和 ASCII layout，停在低保真结构阶段。",
+      "should_trigger": false,
+      "expected_route": "ui-mockup-desktop-workbench",
+      "expected_output": "Hands the usable PRD to ui-mockup-desktop-workbench in structure-only mode.",
+      "assertions": [
+        {
+          "text": "Does not continue PRD drafting when the requested artifact is a structure-only wireframe."
+        }
+      ]
+    },
+    {
+      "id": "paired-high-fidelity-after-structure-confirmed",
+      "type": "non-trigger",
+      "prompt": "桌面工作台 PRD、页面结构和状态模型已经确认；请输出高保真 UI handoff、component map 和 implementation notes。",
+      "should_trigger": false,
+      "expected_route": "ui-mockup-desktop-workbench",
+      "expected_output": "Hands the confirmed PRD and structure to ui-mockup-desktop-workbench for high-fidelity delivery.",
+      "assertions": [
+        {
+          "text": "Does not claim PRD drafting owns high-fidelity component mapping and implementation notes."
+        }
+      ]
+    },
+    {
+      "id": "EVAL-B2-01",
+      "type": "capability",
+      "prompt": "为一个带退款审批抽屉的页面型 PRD 建立 Product Delivery Package。输入提供 PRD、当前前端基线、HTML、Action Contract、默认/无权限/成功/失败截图和对应 PRD 章节；先完成 Maker 阶段并运行 Manifest validator，不要替 Reviewer 下结论。",
+      "expected_output": "Creates product-delivery-manifest.yaml, records ui_required=true and the page evidence graph, computes the current input fingerprint, and stops at review_pending without writing review, approval, or release facts.",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "Manifest records PRD, Action Contract, HTML, screenshots, baseline, and anchors using Package-relative allowlisted artifact paths."
+        },
+        {
+          "text": "The deterministic validator passes and derives review_pending rather than package_ready."
+        },
+        {
+          "text": "Maker does not write review, approval, or release results."
+        }
+      ]
+    },
+    {
+      "id": "EVAL-B2-02",
+      "type": "boundary-risk",
+      "prompt": "检查两个 Product Delivery Package：A 定义用户可见配置页却缺 HTML、截图和 anchor；B 是完全无用户可见 surface 的内部限流规则，并显式写 no_user_visible_surface。不要为了过门禁伪造 UI 证据。",
+      "expected_output": "Fails Package A closed, accepts Package B without UI artifacts, and rejects frontend-unavailable or time-pressure as no-UI reasons.",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "The page Package cannot pass without HTML, Action Contract, screenshots, anchors, and a current UI baseline."
+        },
+        {
+          "text": "The no-UI Package may omit HTML and screenshots only with reason no_user_visible_surface."
+        },
+        {
+          "text": "No fake UI artifact is created to satisfy the contract."
+        }
+      ]
+    },
+    {
+      "id": "concise-module-first-prd-regression",
+      "type": "behavior-regression",
+      "prompt": "基于附件中的企业试用当前页参考 HTML 写一份标准 PRD：增加申请弹窗、试用中入口、到期提示和执行拦截。该附件是用户确认的现状基线，请完成可以交给设计、研发和测试阅读的第一版。",
+      "expected_output": "以附件 reference-html 为低置信现状基线；背景不超过 200 字且不为凑字数扩写；不单列用户场景、入口、页面结构、核心对象和交互逻辑，而是按申请、试用中、到期与拦截等功能模块组织；生成目标态 HTML 和截图，每个可见模块包含对应目标态截图和简短功能逻辑；简单页面状态不生成流程图。",
+      "files": [
+        "evals/fixtures/enterprise-trial-current.html"
+      ],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "Background explains the current problem and scope in no more than 200 visible Chinese characters."
+        },
+        {
+          "text": "The body is organized by feature modules and does not emit standalone user-scenario, entry, page-structure, core-object, or interaction chapters."
+        },
+        {
+          "text": "Every visible feature module pairs target-state UI evidence with concise condition, user action, system behavior, and UI feedback logic."
+        },
+        {
+          "text": "The current screenshot is labeled as current-state reference and cannot satisfy target-state evidence."
+        },
+        {
+          "text": "No process diagram is generated for page-local state changes."
+        }
+      ]
+    },
+    {
+      "id": "complex-flow-uses-drawio-and-module-details",
+      "type": "transfer",
+      "prompt": "基于附件中的供应商管理当前页参考 HTML 写一份供应商准入 PRD：供应商提交资料，采购初审，合规异步核验，不通过退回补充后再次提交，通过后通知财务开通结算；有申请页、审核台和结果页。该附件是用户确认的现状基线。",
+      "expected_output": "以附件 reference-html 为低置信现状基线并选择 Standard；由于跨四类角色/系统、包含异步核验和退回回流，生成并验证 Draw.io 核心流程；正文仍按申请、审核、结果功能模块组织，生成目标态 HTML 和截图，每个页面模块包含对应目标态 UI 和逻辑，不把流程图扩写成重复正文。",
+      "files": [
+        "evals/fixtures/supplier-onboarding-current.html"
+      ],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "The cross-role asynchronous return loop is represented in an editable and validated Draw.io artifact."
+        },
+        {
+          "text": "Application, review, and result pages remain separate feature modules with target-state UI and local logic."
+        },
+        {
+          "text": "The diagram explains ordering and return edges without duplicating each module's detailed rules."
+        }
+      ]
+    },
+    {
+      "id": "simple-ui-change-does-not-create-diagram",
+      "type": "negative-regression",
+      "prompt": "基于附件中的订单当前页参考 HTML 写一个 PRD：在下载按钮旁增加无权限提示，点击后保留当前筛选条件。该附件是用户确认的现状基线。",
+      "expected_output": "以附件 reference-html 为低置信现状基线并选择 Lite；用短背景、一个功能模块、生成的目标态 UI 截图、功能逻辑和可验证结果完成说明；不生成流程图，也不创建验收、用户场景、入口与触发等独立章节。",
+      "files": [
+        "evals/fixtures/order-download-current.html"
+      ],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "Selects PRD-lite and keeps the deliverable readable within five minutes."
+        },
+        {
+          "text": "Does not generate Draw.io, Mermaid, ASCII flow, or a standalone user-scenario section."
+        },
+        {
+          "text": "The target-state UI and permission behavior are explained in one feature module."
+        }
+      ]
+    },
+    {
+      "id": "explicit-drawio-overrides-simple-complexity",
+      "type": "boundary-regression",
+      "prompt": "基于附件中的订单当前页参考 HTML 写 PRD：在下载按钮旁增加无权限提示，并按我的明确要求补一张可编辑 Draw.io 流程图，即使这个改动本身很简单。",
+      "expected_output": "因为用户明确要求正式图示，将原本的 Lite 改动升级为 Standard，生成并验证可编辑 Draw.io；复杂度门槛不能覆盖显式请求。页面模块仍生成目标态 UI 和功能逻辑，不用流程图重复 UI 细节。",
+      "files": [
+        "evals/fixtures/order-download-current.html"
+      ],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "The explicit diagram request produces a validated editable Draw.io artifact even though the flow is simple."
+        },
+        {
+          "text": "The request is upgraded from Lite to Standard instead of being rejected by the automatic complexity threshold."
+        },
+        {
+          "text": "The feature module still pairs target-state UI evidence with concise functional logic."
+        }
+      ]
+    },
+    {
+      "id": "holdout-similar-state-names-split-by-owner-and-scope",
+      "type": "holdout",
+      "prompt": "基于附件中的团队账单当前页参考 HTML 写 PRD。企业可能是“未开通自动续费”，成员个人也可能是“未开启到账提醒”；两者都会显示未开启，但影响范围不同。页面还要新增设置入口和保存结果提示。该附件是用户确认的现状基线。",
+      "expected_output": "以附件 reference-html 为低置信现状基线，以设置入口和保存结果为功能模块，生成目标态 HTML 和截图；把企业续费状态与成员提醒状态按主体、判定时点、影响范围和用途拆开，避免用一个未开启状态控制两类行为；局部页面改动不画流程图。",
+      "files": [
+        "evals/fixtures/team-billing-current.html"
+      ],
+      "should_trigger": true,
+      "expected_route": "prd-architect",
+      "assertions": [
+        {
+          "text": "Enterprise renewal and member notification states are modeled as separate state variables."
+        },
+        {
+          "text": "Each ambiguous state records subject, decision time, affected scope, and purpose."
+        },
+        {
+          "text": "The flow and UI logic do not use one generic disabled state to control both behaviors."
+        }
+      ]
+    }
+  ]
+}

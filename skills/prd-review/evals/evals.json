@@ -1,0 +1,188 @@
+{
+  "skill_name": "prd-review",
+  "evals": [
+    {
+      "id": "detect-overtechnical-product-draft",
+      "type": "trigger",
+      "prompt": "帮我 review 这份 Agent 下一步行动建议 PRD。它是初版产品讨论稿，但正文里有 TypeScript interface、JSON 示例、metadata 和 adapter 章节。",
+      "should_trigger": true,
+      "expected_route": "prd-review",
+      "expected_output": "指出阶段混淆和过早技术化，建议把 schema/metadata/adapter 移到开发 handoff 附录，并把主文档压缩为短背景和功能模块，在对应模块内说明目标态 UI、触发、系统行为、UI 反馈、异常和可验证结果，不新增独立验收章节。",
+      "assertions": [
+        {
+          "text": "Flags over-technical content as a PRD shape issue."
+        },
+        {
+          "text": "Recommends moving implementation details to a handoff appendix."
+        }
+      ],
+      "known_regression": "Initial PRD drafts can become developer handoffs too early."
+    },
+    {
+      "id": "diagram-editability-review",
+      "type": "trigger",
+      "prompt": "帮我审一个 PRD：它说有可编辑流程图，但 Markdown 引用的是普通 png 截图，没有 drawio 源文件。",
+      "should_trigger": true,
+      "expected_route": "prd-review",
+      "expected_output": "区分图示文本要求缺失、文件实际不可验证和可编辑性未验证，建议补 .drawio 或 .drawio.svg 并运行 validate_drawio.py。",
+      "assertions": [
+        {
+          "text": "Does not treat PNG screenshots as editable Draw.io diagrams."
+        },
+        {
+          "text": "Recommends validate_drawio.py when a .drawio source exists."
+        }
+      ]
+    },
+    {
+      "id": "explicit-drawio-request-is-not-overridden-by-complexity",
+      "type": "boundary-regression",
+      "prompt": "帮我审这份 PRD：需求只是给一个按钮增加无权限提示，用户明确要求附一张可编辑 Draw.io，但作者以流程不够复杂为由省略了。",
+      "should_trigger": true,
+      "expected_route": "prd-review",
+      "expected_output": "指出显式图示请求优先于自动复杂度门槛；建议将 Lite 升级为 Standard，补可编辑 Draw.io 并验证，而不是接受省略理由。",
+      "assertions": [
+        {
+          "text": "Treats the user's explicit Draw.io request as an unconditional diagram requirement."
+        },
+        {
+          "text": "Recommends upgrading Lite to Standard and validating the editable artifact."
+        }
+      ]
+    },
+    {
+      "id": "readiness-verdict",
+      "type": "trigger",
+      "prompt": "这个 PRD 能不能交给开发写 implementation plan？请从 PM、研发、测试视角挑阻断项。",
+      "should_trigger": true,
+      "expected_route": "prd-review",
+      "expected_output": "Outputs findings, revision draft, open questions, and one readiness verdict: Ready for writing-plans, Ready with assumptions, or Not ready.",
+      "assertions": [
+        {
+          "text": "Includes Implementation-Plan Readiness."
+        },
+        {
+          "text": "Distinguishes blockers from important improvements."
+        }
+      ]
+    },
+    {
+      "id": "handoff-prd-conflict",
+      "type": "trigger",
+      "prompt": "这里有 handoff 和 PRD，handoff 说只做图片生成后的下一步行动，PRD 却把 PPT 下载按钮也算 Agent 下一步。帮我审一下。",
+      "should_trigger": true,
+      "expected_route": "prd-review",
+      "expected_output": "Identifies the handoff/PRD conflict, marks the source of truth, and proposes a minimal revision that separates function-level buttons from agent-conversational next actions.",
+      "assertions": [
+        {
+          "text": "Separates handoff facts from PRD text."
+        },
+        {
+          "text": "Provides a concrete revision draft."
+        }
+      ]
+    },
+    {
+      "id": "no-prd-route-to-architect",
+      "type": "non-trigger",
+      "prompt": "我只有一个想法：回答后展示下一步行动。帮我写一份 PRD。",
+      "should_trigger": false,
+      "expected_route": "prd-architect",
+      "expected_output": "Routes to PRD drafting rather than reviewing a non-existent PRD.",
+      "assertions": [
+        {
+          "text": "Does not produce a PRD review report without a PRD artifact."
+        }
+      ]
+    },
+    {
+      "id": "solution-grill-not-prd-review",
+      "type": "non-trigger",
+      "prompt": "我已经有这个产品方案了，你连续拷问我它哪里会失败。",
+      "should_trigger": false,
+      "expected_route": "grill-me",
+      "expected_output": "Routes to grill-me because the user wants interactive solution pressure testing rather than artifact readiness review.",
+      "assertions": [
+        {
+          "text": "Does not replace interactive pressure testing with PRD artifact review."
+        }
+      ]
+    },
+    {
+      "id": "paired-prd-drafting-stage",
+      "type": "non-trigger",
+      "prompt": "当前只有一个已确认的产品想法，还没有 PRD；请起草 PRD，暂不评审 readiness，也不拆研发 issues。",
+      "should_trigger": false,
+      "expected_route": "prd-architect",
+      "expected_output": "Hands PRD creation to prd-architect because no reviewable artifact exists.",
+      "assertions": [
+        {
+          "text": "Does not invent a readiness review for a PRD that has not been drafted."
+        }
+      ]
+    },
+    {
+      "id": "paired-prd-readiness-review-stage",
+      "type": "routing-regression",
+      "prompt": "已有一份 PRD，但交付开发前的阻断项还没评审；请给 readiness verdict，暂不拆研发 issues。",
+      "should_trigger": true,
+      "expected_route": "prd-review",
+      "expected_output": "Reviews blockers and produces the readiness verdict without decomposing implementation issues.",
+      "assertions": [
+        {
+          "text": "Owns artifact readiness after a PRD exists and before issue decomposition."
+        }
+      ],
+      "known_regression": "docs/audits/skill-overlap-v0.2.1.md"
+    },
+    {
+      "id": "paired-prd-ready-issue-decomposition-stage",
+      "type": "non-trigger",
+      "prompt": "PRD 已完成评审并标记 Ready；请按 vertical slice 拆成可领取的研发 issues，不再改写或评审 PRD。",
+      "should_trigger": false,
+      "expected_route": "prd-to-issues",
+      "expected_output": "Hands the Ready PRD to prd-to-issues for vertical-slice backlog decomposition.",
+      "assertions": [
+        {
+          "text": "Does not repeat readiness review after the PRD is explicitly Ready."
+        }
+      ]
+    },
+    {
+      "id": "EVAL-B2-04",
+      "type": "independence-boundary",
+      "prompt": "评审一个 Product Delivery Package：Maker 自己写了 ready，reviewer_identity 与 maker_identity 相同，而且 Package verdict 只有 content/artifacts 两项检查。请给 Package verdict，不要修改被评审产物。",
+      "expected_output": "Rejects the self-review, requires one verdict bound to the current input fingerprint with content/artifacts/publish checks, writes only the review partition, and does not produce package_ready.",
+      "files": [],
+      "should_trigger": true,
+      "expected_route": "prd-review",
+      "assertions": [
+        {
+          "text": "Reviewer identity must be independent from every Maker/UI Producer identity for the revision."
+        },
+        {
+          "text": "Package verdict contains exactly content, artifacts, and publish checks and binds the current input fingerprint."
+        },
+        {
+          "text": "The invalid self-review remains changes_requested and cannot authorize publication."
+        }
+      ]
+    },
+    {
+      "id": "package-pre-split-review-record",
+      "type": "regression",
+      "prompt": "这份 Product Delivery Package 还没有拆版本或 issues。请做拆分前独立 Review，并把结论写回 Manifest；不要生成规划产物。",
+      "should_trigger": true,
+      "expected_route": "prd-review",
+      "expected_output": "评审 PRD 与适用 UI 证据，并把覆盖全部当前生产者的结论绑定到 pre_split_input_fingerprint 后写入 pre_split_review。",
+      "assertions": [
+        {
+          "text": "不把拆分前结论写入最终 review，也不提前生成规划产物。"
+        },
+        {
+          "text": "Reviewer 与 PRD/UI artifact producers 身份独立。"
+        }
+      ]
+    }
+  ]
+}
